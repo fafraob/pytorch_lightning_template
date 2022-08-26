@@ -15,7 +15,7 @@ class TrainConfigurator():
         self._parser = ArgumentParser()
         self._parser.add_argument(
             '-c', '--config', help='path to config file', required=True)
-        args = self._parser.parse_args()
+        args = self._parser.parse_known_args()[0]
         self.cfg = import_module('.' + args.config, 'configs').cfg
         self.Net = import_module('.' + self.cfg.model, 'models').Net
         self.Dataset = import_module(
