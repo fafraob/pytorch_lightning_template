@@ -23,23 +23,20 @@ class Net(pl.LightningModule):
         x = self._model(x)
         return x
 
-    def training_step(self, batch, batch_idx):
+    def _step(self, batch, log_name, metric):
         x, y = batch
         y_pred = self(x)
         loss = self._loss_fn(y_pred, y)
-        self._make_log_entry(loss, 'train_loss', on_step=False)
-        self._train_acc(y_pred, y.int())
-        self._make_log_entry(self._train_acc, 'train_acc', on_step=False)
+        self._make_log_entry(loss, f'{log_name}_loss', on_step=False)
+        metric(y_pred, y.int())
+        self._make_log_entry(metric, f'{log_name}_acc', on_step=False)
         return loss
 
+    def training_step(self, batch, batch_idx):
+        return self._step(batch, 'train', self._train_acc)
+
     def validation_step(self, batch, batch_idx):
-        x, y = batch
-        y_pred = self(x)
-        loss = self._loss_fn(y_pred, y)
-        self._make_log_entry(loss, 'val_loss', on_step=False)
-        self._val_acc(y_pred, y.int())
-        self._make_log_entry(self._val_acc, 'val_acc', on_step=False)
-        return loss
+        return self._step(batch, 'val', self._val_acc)
 
     def configure_optimizers(self):
         out = {'optimizer': self._cfg.optimizer}
