@@ -34,6 +34,8 @@ cfg.mixed_precision = True
 cfg.device = 'cuda:0'
 cfg.accelerator_type = 'gpu'
 cfg.log_every_n_steps = 1
+cfg.to_monitor = 'val_acc'  # save best model based on this score
+cfg.to_monitor_mode = 'max' # higher is better when saving models 
 cfg.image_size = 32
 
 cfg.train_aug = None

@@ -7,6 +7,7 @@ from torch import optim, nn
 from torch.utils.data import DataLoader, Dataset
 from torch.optim.lr_scheduler import _LRScheduler as LRSched
 import pytorch_lightning as pl
+from pytorch_lightning.callbacks import ModelCheckpoint
 
 
 class TrainConfigurator():
@@ -86,7 +87,10 @@ def batch_to_device(batch: Dict, device: str):
 def main():
     cfg = TrainConfigurator().config()
     pl.seed_everything(cfg.seed, workers=True)
+    checkpoint_callback = ModelCheckpoint(
+        monitor=cfg.to_monitor, mode='max', save_last=True)
     trainer = pl.Trainer(
+        callbacks=[checkpoint_callback],
         default_root_dir=Path(cfg.output_dir).joinpath(cfg.name),
         max_epochs=cfg.epochs,
         devices=1,
