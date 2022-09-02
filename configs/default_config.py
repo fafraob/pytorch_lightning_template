@@ -14,6 +14,7 @@ cfg.resume_from_ckpt = None  # otherwise path to .ckpt
 
 # dataset
 cfg.dataset = 'example_dataset'
+cfg.dataloader_collate_fn = None
 cfg.normalize = None
 cfg.batch_size = 64
 cfg.batch_size_val = 64

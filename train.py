@@ -66,7 +66,8 @@ class TrainConfigurator():
             shuffle=train,
             batch_size=self.cfg.batch_size if train else self.cfg.batch_size_val,
             drop_last=False,
-            num_workers=self.cfg.dataloader_workers
+            num_workers=self.cfg.dataloader_workers,
+            collate_fn=self.cfg.dataloader_collate_fn
         )
         return dataloader
 
