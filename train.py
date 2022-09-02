@@ -88,7 +88,7 @@ def main():
     cfg = TrainConfigurator().config()
     pl.seed_everything(cfg.seed, workers=True)
     checkpoint_callback = ModelCheckpoint(
-        monitor=cfg.to_monitor, mode='max', save_last=True)
+        monitor=cfg.to_monitor, mode=cfg.to_monitor_mode, save_last=True)
     trainer = pl.Trainer(
         callbacks=[checkpoint_callback],
         default_root_dir=Path(cfg.output_dir).joinpath(cfg.name),
