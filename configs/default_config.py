@@ -11,6 +11,7 @@ cfg.output_dir = 'outputs/'
 cfg.train_df = cfg.data_dir + 'spiral_train.csv'
 cfg.val_df = cfg.data_dir + 'spiral_val.csv'
 cfg.resume_from_ckpt = None  # otherwise path to .ckpt
+cfg.initial_weights = None   # otherwise path to .ckpt
 
 # dataset
 cfg.dataset = 'example_dataset'

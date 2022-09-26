@@ -1,13 +1,14 @@
 from argparse import ArgumentParser
 from importlib import import_module
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict
 import numpy as np
-from torch import optim, nn
+from torch import optim
 from torch.utils.data import DataLoader, Dataset
 from torch.optim.lr_scheduler import _LRScheduler as LRSched
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
+import torch
 
 
 class TrainConfigurator():
@@ -100,6 +101,9 @@ def main():
         deterministic=True,
         log_every_n_steps=cfg.log_every_n_steps
     )
+    if cfg.initial_weights:
+        checkpoint = torch.load(cfg.initial_weights)
+        cfg.net.load_state_dict(checkpoint['state_dict'])
     trainer.fit(
         model=cfg.net,
         train_dataloaders=cfg.train_loader,
