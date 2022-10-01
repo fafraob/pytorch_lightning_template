@@ -38,6 +38,7 @@ cfg.accelerator_type = 'gpu'
 cfg.log_every_n_steps = 1
 cfg.to_monitor = 'val_acc'  # save best model based on this score
 cfg.to_monitor_mode = 'max' # higher is better when saving models 
+cfg.save_top_k = -1  # save this number of best models (-1 for all models)
 cfg.image_size = 32
 
 cfg.train_aug = None
