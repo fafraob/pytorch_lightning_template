@@ -56,6 +56,7 @@ class TrainConfigurator():
         dataset = self.Dataset(
             self.cfg.train_df if train else self.cfg.val_df,
             self.cfg.data_folder if train else self.cfg.val_data_folder,
+            train,
             self.cfg,
             self.cfg.train_aug if train else self.cfg.val_aug
         )
@@ -90,7 +91,7 @@ def main():
     cfg = TrainConfigurator().config()
     pl.seed_everything(cfg.seed, workers=True)
     checkpoint_callback = ModelCheckpoint(
-        monitor=cfg.to_monitor, mode=cfg.to_monitor_mode, 
+        monitor=cfg.to_monitor, mode=cfg.to_monitor_mode,
         save_top_k=cfg.save_top_k, save_last=True)
     trainer = pl.Trainer(
         callbacks=[checkpoint_callback],

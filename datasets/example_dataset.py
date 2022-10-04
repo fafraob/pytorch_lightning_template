@@ -7,7 +7,7 @@ import pandas as pd
 
 class CustomDataset(Dataset):
 
-    def __init__(self, df_path: str, data_folder: str, cfg: SimpleNamespace, aug) -> None:
+    def __init__(self, df_path: str, data_folder: str, train_set: bool, cfg: SimpleNamespace, aug) -> None:
         self._df = pd.read_csv(df_path)
 
     def __len__(self) -> int:
