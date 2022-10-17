@@ -78,7 +78,6 @@ class TrainConfigurator():
             seed = np.random.randint(1_000_000)
         else:
             seed = self.cfg.seed
-        print(seed)
         return seed
 
 
