@@ -7,8 +7,8 @@ class Net(pl.LightningModule):
 
     def __init__(self, cfg):
         super().__init__()
-        self._cfg = cfg
-        self._model = nn.Sequential(
+        self.cfg = cfg
+        self.model = nn.Sequential(
             nn.Linear(2, 512),
             nn.GELU(),
             nn.Linear(512, 256),
@@ -20,7 +20,7 @@ class Net(pl.LightningModule):
         self._val_acc = Accuracy(num_classes=2)
 
     def forward(self, x, y=None):
-        x = self._model(x)
+        x = self.model(x)
         return x
 
     def _step(self, batch, log_name, metric):
@@ -39,11 +39,13 @@ class Net(pl.LightningModule):
         return self._step(batch, 'val', self._val_acc)
 
     def configure_optimizers(self):
-        out = {'optimizer': self._cfg.optimizer}
-        scheduler = self._cfg.scheduler
-        if scheduler is not None:
-            out['lr_scheduler'] = scheduler
-        return out
+        optimizer = self.cfg.optimizer
+        lr_scheduler = {
+            'scheduler': self.cfg.scheduler,
+            'interval': self.cfg.scheduler_interval,
+            'frequency': 1
+        }
+        return [optimizer], [lr_scheduler]
 
     def _make_log_entry(
         self, loss, name='train_loss', on_step=True,
