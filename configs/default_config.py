@@ -16,6 +16,7 @@ cfg.initial_weights = None   # otherwise path to .ckpt
 
 # dataset
 cfg.dataset = 'example_dataset'
+cfg.num_classes = 2
 cfg.dataloader_collate_fn = None
 cfg.normalize = None
 cfg.batch_size = 64

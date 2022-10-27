@@ -7,3 +7,4 @@ pip3 install pytorch-lightning timm
 pip3 install numpy pandas
 pip3 install opencv-python albumentations
 pip3 install notebook autopep8 tensorboard tqdm
+pip3 install matplotlib
