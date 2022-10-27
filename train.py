@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 from copy import deepcopy
 from importlib import import_module
 import json
+import os
 from pathlib import Path, PosixPath
 import sys
 from typing import Optional, Union
@@ -105,22 +106,10 @@ class TrainConfigurator():
             seed = self.cfg.seed
         return seed
 
-    def save_config_in_logs(self, trainer_root_dir: Union[PosixPath, str]):
+    def save_config(self, trainer_log_dir: Union[PosixPath, str]):
         # makes assumptions about how lightning logs are saved
-        max_version = -1
-        path = Path(trainer_root_dir).joinpath('lightning_logs')
-        path.mkdir(parents=True, exist_ok=True)
-        for log_dir in path.glob('version_*'):
-            try:
-                version = int(log_dir.name.split('_')[-1])
-                max_version = max(max_version, version)
-            except ValueError:
-                continue
-            except Exception as e:
-                print(e)
-                sys.exit(1)
-        next_log_version = max_version + 1
-        log_cfg_file = path.joinpath(f'version_{next_log_version}_cfg.json')
+        Path(trainer_log_dir).mkdir(parents=True, exist_ok=True)
+        log_cfg_file = os.path.join(trainer_log_dir, f'config.json')
         with open(log_cfg_file, 'w') as f:
             f.write(json.dumps(self.raw_cfg, indent=4))
 
@@ -136,12 +125,9 @@ def main():
         save_top_k=cfg.save_top_k, save_last=True)
     lr_monitor = LearningRateMonitor(logging_interval='step')
 
-    trainer_root_dir = str(Path(cfg.output_dir).joinpath(cfg.name))
-    tc.save_config_in_logs(trainer_root_dir)
-
     trainer = pl.Trainer(
         callbacks=[checkpoint_callback, lr_monitor],
-        default_root_dir=trainer_root_dir,
+        default_root_dir=str(Path(cfg.output_dir).joinpath(cfg.name)),
         max_epochs=cfg.epochs,
         devices=1,
         accelerator=cfg.accelerator_type,
@@ -149,6 +135,8 @@ def main():
         deterministic=True,
         log_every_n_steps=cfg.log_every_n_steps
     )
+
+    tc.save_config(trainer.logger.log_dir)
 
     if cfg.initial_weights:
         checkpoint = torch.load(cfg.initial_weights)
