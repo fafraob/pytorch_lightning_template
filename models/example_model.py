@@ -63,6 +63,7 @@ class Net(pl.LightningModule):
             cf_img,
             global_step=self.current_epoch
         )
+        plt.close()
 
     def configure_optimizers(self):
         optimizer = self.cfg.optimizer
