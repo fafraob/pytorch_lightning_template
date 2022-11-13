@@ -74,6 +74,10 @@ class Net(pl.LightningModule):
         }
         return [optimizer], [lr_scheduler]
 
+    def lr_scheduler_step(self, scheduler, optimizer_idx, metric) -> None:
+        # NOTE: required for timm schedulers to work
+        scheduler.step(epoch=self.current_epoch)
+
     def _make_log_entry(
         self, loss, name='train_loss', on_step=True,
         on_epoch=True, prog_bar=True, logger=True

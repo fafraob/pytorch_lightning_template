@@ -4,14 +4,14 @@ from types import SimpleNamespace
 cfg = SimpleNamespace(**{})
 
 # paths
-cfg.name = 'test_run'
+cfg.name = 'logs'
 cfg.data_dir = os.path.join('data', 'example_data')
 cfg.data_folder = cfg.data_dir
 cfg.val_data_folder = cfg.data_dir
 cfg.output_dir = '.'
 cfg.train_df = os.path.join(cfg.data_dir, 'spiral_train.csv')
 cfg.val_df = os.path.join(cfg.data_dir, 'spiral_val.csv')
-cfg.resume_from_ckpt = None  # otherwise path to .ckpt
+cfg.resume_from_ckpt = "/home/user/dev/pytorch_lightning_template/logs/lightning_logs/version_0/checkpoints/last.ckpt"  # otherwise path to .ckpt
 cfg.initial_weights = None   # otherwise path to .ckpt
 
 # dataset
@@ -27,16 +27,23 @@ cfg.dataloader_workers = 12
 cfg.model = 'example_model'
 
 # training
-cfg.epochs = 20
-cfg.lr = 1e-4
-cfg.lr_min = 1e-7
+cfg.epochs = 30
+cfg.epochs_scheduler = cfg.epochs
 cfg.scheduler = 'cosine'  # cosine
-cfg.scheduler_interval = 'epoch'  # step
+cfg.lr_optim = 1e-3
+cfg.warmup_lr_init = 0
+cfg.lr_min = 1e-9
+cfg.warmup_t = 2
+cfg.cycle_decay = 1.0
+cfg.cycle_limit = 1
+cfg.scheduler_interval = 'step'  # epoch
+
 cfg.optimizer = 'adamw'  # adamw, adam
 cfg.optim_betas = (0.9, 0.999)
 cfg.optim_eps = 1e-8
-
 cfg.optim_capturable = True
+
+cfg.devices = 1
 cfg.seed = -1
 cfg.mixed_precision = True
 cfg.device = 'cuda:0'
@@ -45,7 +52,6 @@ cfg.log_every_n_steps = 1
 cfg.to_monitor = 'val_acc'  # save best model based on this score
 cfg.to_monitor_mode = 'max'  # higher is better when saving models
 cfg.save_top_k = -1  # save this number of best models (-1 for all models)
-cfg.image_size = 32
 
 cfg.train_aug = None
 cfg.val_aug = None
