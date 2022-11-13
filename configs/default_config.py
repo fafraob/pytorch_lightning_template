@@ -11,8 +11,8 @@ cfg.val_data_folder = cfg.data_dir
 cfg.output_dir = '.'
 cfg.train_df = os.path.join(cfg.data_dir, 'spiral_train.csv')
 cfg.val_df = os.path.join(cfg.data_dir, 'spiral_val.csv')
-cfg.resume_from_ckpt = "/home/user/dev/pytorch_lightning_template/logs/lightning_logs/version_0/checkpoints/last.ckpt"  # otherwise path to .ckpt
-cfg.initial_weights = None   # otherwise path to .ckpt
+cfg.resume_from_ckpt = None  # otherwise path to .ckpt
+cfg.initial_weights = None  # otherwise path to .ckpt
 
 # dataset
 cfg.dataset = 'example_dataset'

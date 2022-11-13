@@ -23,7 +23,8 @@ class TrainConfigurator():
             '-c', '--config', help='path to config file', required=True)
         args = self.parser.parse_known_args()[0]
         self.cfg = import_module('.' + args.config, 'configs').cfg
-        self.raw_cfg = deepcopy(self.cfg.__dict__)
+        self.path_to_cfg = Path(__file__).parent.joinpath(
+            'configs', f'{args.config}.py')
         self.Net = import_module('.' + self.cfg.model, 'models').Net
         self.Dataset = import_module(
             '.' + self.cfg.dataset, 'datasets').CustomDataset
@@ -100,9 +101,11 @@ class TrainConfigurator():
     def save_config(self, trainer_log_dir: Union[PosixPath, str]):
         # NOTE: makes assumptions about how lightning logs are saved
         Path(trainer_log_dir).mkdir(parents=True, exist_ok=True)
-        log_cfg_file = os.path.join(trainer_log_dir, f'config.json')
+        log_cfg_file = os.path.join(trainer_log_dir, f'config.py')
+        with open(self.path_to_cfg, 'r') as f:
+            cfg_contents = f.read()
         with open(log_cfg_file, 'w') as f:
-            f.write(json.dumps(self.raw_cfg, indent=4))
+            f.write(cfg_contents)
 
 
 def main():
