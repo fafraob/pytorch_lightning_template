@@ -6,7 +6,9 @@ import io
 import torchvision
 from PIL import Image
 import torch
+import matplotlib
 import matplotlib.pyplot as plt
+matplotlib.use('Agg')
 
 
 class Net(pl.LightningModule):
