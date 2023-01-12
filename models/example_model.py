@@ -1,19 +1,21 @@
 import pytorch_lightning as pl
-from torch import nn
+from torch import nn, Tensor
 from torchmetrics import Accuracy
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import io
 import torchvision
 from PIL import Image
 import torch
+from typing import Dict, Tuple, Any
 import matplotlib
 import matplotlib.pyplot as plt
+from types import SimpleNamespace
 matplotlib.use('Agg')
 
 
 class Net(pl.LightningModule):
 
-    def __init__(self, cfg):
+    def __init__(self, cfg: SimpleNamespace) -> None:
         super().__init__()
         self.cfg = cfg
         self.model = nn.Sequential(
@@ -24,14 +26,14 @@ class Net(pl.LightningModule):
             nn.Linear(256, 2)
         )
         self._loss_fn = nn.BCEWithLogitsLoss()
-        self._train_acc = Accuracy(num_classes=2)
-        self._val_acc = Accuracy(num_classes=2)
+        self._train_acc = Accuracy('binary', num_classes=2)
+        self._val_acc = Accuracy('binary', num_classes=2)
 
-    def forward(self, x, y=None):
+    def forward(self, x: Tensor) -> Tensor:
         x = self.model(x)
         return x
 
-    def _step(self, batch, log_name, metric):
+    def _step(self, batch: Tensor, log_name: str, metric: Accuracy) -> Dict[str, Tensor]:
         x, y = batch
         y_pred = self(x)
         loss = self._loss_fn(y_pred, y)
@@ -40,10 +42,10 @@ class Net(pl.LightningModule):
         self._make_log_entry(metric, f'{log_name}_acc', on_step=False)
         return {'loss': loss, 'outputs': y_pred, 'labels': y.to(torch.int)}
 
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch: Tensor, batch_idx: int) -> Dict[str, Tensor]:
         return self._step(batch, 'train', self._train_acc)
 
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch: Tensor, batch_idx: int) -> Dict[str, Tensor]:
         return self._step(batch, 'val', self._val_acc)
 
     def validation_epoch_end(self, outputs):
@@ -67,7 +69,7 @@ class Net(pl.LightningModule):
         )
         plt.close()
 
-    def configure_optimizers(self):
+    def configure_optimizers(self) -> Tuple:
         optimizer = self.cfg.optimizer
         lr_scheduler = {
             'scheduler': self.cfg.scheduler,
@@ -76,14 +78,14 @@ class Net(pl.LightningModule):
         }
         return [optimizer], [lr_scheduler]
 
-    def lr_scheduler_step(self, scheduler, optimizer_idx, metric) -> None:
+    def lr_scheduler_step(self, scheduler, optimizer_idx: int, metric: Any | None) -> None:
         # NOTE: required for timm schedulers to work
         scheduler.step(epoch=self.current_epoch)
 
     def _make_log_entry(
-        self, loss, name='train_loss', on_step=True,
-        on_epoch=True, prog_bar=True, logger=True
-    ):
+        self, loss: Tensor, name: str = 'train_loss', on_step: bool = True,
+        on_epoch: bool = True, prog_bar: bool = True, logger: bool = True
+    ) -> None:
         self.log(
             name,
             loss,
