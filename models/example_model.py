@@ -1,16 +1,9 @@
 import pytorch_lightning as pl
 from torch import nn, Tensor
 from torchmetrics import Accuracy
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-import io
-import torchvision
-from PIL import Image
 import torch
 from typing import Dict, Tuple, Any
-import matplotlib
-import matplotlib.pyplot as plt
 from types import SimpleNamespace
-matplotlib.use('Agg')
 
 
 class Net(pl.LightningModule):
@@ -48,39 +41,8 @@ class Net(pl.LightningModule):
     def validation_step(self, batch: Tensor, batch_idx: int) -> Dict[str, Tensor]:
         return self._step(batch, 'val', self._val_acc)
 
-    def validation_epoch_end(self, outputs):
-        preds = torch.cat([tmp['outputs'] for tmp in outputs])
-        preds = preds.argmax(dim=1).cpu().detach().numpy()
-        labels = torch.cat([tmp['labels'] for tmp in outputs])
-        labels = labels.argmax(dim=1).cpu().detach().numpy()
-        label_idxs = [i for i in range(self.cfg.num_classes)]
-        cf_matrix = confusion_matrix(labels, preds, labels=label_idxs)
-        disp = ConfusionMatrixDisplay(cf_matrix, display_labels=label_idxs)
-        _, ax = plt.subplots(figsize=(12, 12))
-        disp.plot(ax=ax, colorbar=False)
-        buf = io.BytesIO()
-        plt.savefig(buf, format='jpeg', bbox_inches='tight')
-        buf.seek(0)
-        cf_img = torchvision.transforms.ToTensor()(Image.open(buf))
-        self.logger.experiment.add_image(
-            'val_confusion_matrix',
-            cf_img,
-            global_step=self.current_epoch
-        )
-        plt.close()
-
     def configure_optimizers(self) -> Tuple:
-        optimizer = self.cfg.optimizer
-        lr_scheduler = {
-            'scheduler': self.cfg.scheduler,
-            'interval': self.cfg.scheduler_interval,
-            'frequency': 1
-        }
-        return [optimizer], [lr_scheduler]
-
-    def lr_scheduler_step(self, scheduler, optimizer_idx: int, metric: Any | None) -> None:
-        # NOTE: required for timm schedulers to work
-        scheduler.step(epoch=self.current_epoch)
+        return [self.cfg.optimizer], [self.cfg.scheduler]
 
     def _make_log_entry(
         self, loss: Tensor, name: str = 'train_loss', on_step: bool = True,

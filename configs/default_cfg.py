@@ -28,17 +28,12 @@ cfg.model = 'example_model'
 
 # training
 cfg.epochs = 30
-cfg.epochs_scheduler = cfg.epochs
-cfg.scheduler = 'cosine'  # cosine
+cfg.scheduler = 'step'  # step
 cfg.lr_optim = 1e-3
-cfg.warmup_lr_init = 0
-cfg.lr_min = 1e-9
-cfg.warmup_t = 2
-cfg.cycle_decay = 1.0
-cfg.cycle_limit = 1
-cfg.scheduler_interval = 'step'  # epoch
+cfg.scheduler_step_size = 3
+cfg.scheduler_gamma = 0.2
 
-cfg.optimizer = 'adamw'  # adamw, adam
+cfg.optimizer = 'adamw'  # adamw, adam, sgd
 cfg.optim_betas = (0.9, 0.999)
 cfg.optim_eps = 1e-8
 cfg.optim_capturable = True

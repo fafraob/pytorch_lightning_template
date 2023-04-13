@@ -1,14 +1,12 @@
 from argparse import ArgumentParser
-from copy import deepcopy
 from importlib import import_module
-import json
 import os
 from pathlib import Path, PosixPath
 from typing import Optional, Union
 import numpy as np
 from torch.utils.data import DataLoader, Dataset
-from torch.optim.lr_scheduler import _LRScheduler
-from torch.optim import Optimizer, Adam, AdamW
+from torch.optim.lr_scheduler import _LRScheduler, StepLR
+from torch.optim import Optimizer, Adam, AdamW, SGD
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 import torch
@@ -54,6 +52,9 @@ class TrainConfigurator():
             optimizer = Adam(
                 cfg.net.parameters(), cfg.lr_optim, betas=cfg.optim_betas,
                 eps=cfg.optim_eps, capturable=cfg.optim_capturable)
+        elif name == 'sgd':
+            optimizer = SGD(cfg.net.parameters(), lr=cfg.lr_optim,
+                            momentum=cfg.optim_momentum, weight_decay=cfg.optim_weight_decay)
         else:
             raise ValueError('Optimizer must be set to an allowed value.')
         return optimizer
@@ -62,11 +63,9 @@ class TrainConfigurator():
         scheduler = None
         cfg = self.cfg
         name = cfg.scheduler
-        if name == 'cosine':
-            scheduler = CosineLRScheduler(
-                cfg.optimizer, t_initial=cfg.epochs_scheduler, cycle_decay=cfg.cycle_decay,
-                lr_min=cfg.lr_min, warmup_t=cfg.warmup_t, warmup_lr_init=cfg.warmup_lr_init,
-                cycle_limit=cfg.cycle_limit)
+        if name == 'step':
+            scheduler = StepLR(cfg.optimizer, step_size=cfg.scheduler_step_size,
+                               gamma=cfg.scheduler_gamma)
         return scheduler
 
     def _config_dataset(self, train: bool = True) -> Dataset:
@@ -111,6 +110,8 @@ class TrainConfigurator():
 def main():
     tc = TrainConfigurator()
     cfg = tc.config()
+    torch.set_float32_matmul_precision(
+        'medium' if cfg.mixed_precision else 'high')
 
     pl.seed_everything(cfg.seed, workers=True)
 
@@ -125,7 +126,7 @@ def main():
         max_epochs=cfg.epochs,
         devices=cfg.devices,
         accelerator=cfg.accelerator_type,
-        precision=16 if cfg.mixed_precision else 32,
+        precision='16-mixed' if cfg.mixed_precision else 32,
         deterministic=True,
         log_every_n_steps=cfg.log_every_n_steps
     )

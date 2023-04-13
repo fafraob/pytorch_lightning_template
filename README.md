@@ -3,6 +3,15 @@
 Simple and flexible training framework template based on [Pytorch Lightning](https://www.pytorchlightning.ai/).
 
 ## Installation
+There are different ways to use this template.
+
+### Docker
+- Use Docker with vscode and the Docker vscode extension (```Strg + Shift + P``` -> ```Remote-Containers: Rebuild Container```).
+- Use Docker the regular way with the provided [Dockerfile](.devcontainer/Dockerfile).
+- 
+In both cases, you need to activate the conda environment in the container (```source /opt/conda/bin/activate base```).
+
+### Virtual Environment
 Install Python3 packages in a virtual environment, e.g.:
 ```shell
 python3 -m venv .venv
