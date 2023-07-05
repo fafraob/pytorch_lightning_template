@@ -2,27 +2,9 @@
 	"name": "PytorchLightning Docker",
 	"dockerFile": "Dockerfile",
 	"context": "..",
-	"settings": {
-		"terminal.integrated.shell.linux": "/bin/bash"
-	},
-	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"dotjoshjohnson.xml",
-		"laurenttreguier.uncrustify",
-		"ms-azuretools.vscode-docker",
-		"ms-python.python", 
-		"ms-vscode.cpptools",
-		"redhat.vscode-yaml",
-		"smilerobotics.urdf",
-		"streetsidesoftware.code-spell-checker",
-		"twxs.cmake",
-		"yzhang.markdown-all-in-one"
-	],
 	// "postCreateCommand": "sh postCreateCommand.sh",
 	"runArgs": [
 		// nvidia begin
-		"--runtime",
-		"nvidia",
 		"--gpus",
 		"all",
 		// nvidia end
@@ -44,9 +26,27 @@
 		"/tmp/.X11-unix:/tmp/.X11-unix",
 		"--device=/dev:/dev",
 		"--ipc",
-        "host"
+		"host"
 	],
 	// Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "vscode"
+	"remoteUser": "vscode",
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {}
+	},
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"dotjoshjohnson.xml",
+				"laurenttreguier.uncrustify",
+				"ms-azuretools.vscode-docker",
+				"ms-python.python",
+				"redhat.vscode-yaml",
+				"streetsidesoftware.code-spell-checker",
+				"twxs.cmake",
+				"yzhang.markdown-all-in-one"
+			]
+		}
+	}
 }
-
